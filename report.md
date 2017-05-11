@@ -1,4 +1,4 @@
-## Advanced Lane Project Lines Report
+##Advanced Lane Project Lines Report
 
 ---
 
@@ -17,7 +17,7 @@ The goals / steps of this project are the following:
 
 [//]: # (Image References)
 
-[image1]: ./report/undistort_output.png "Undistorted"
+[image1]: ./report/undistort.png "Undistorted"
 [image2]: ./report/test1_undistort.png "Road Transformed"
 [image3]: ./report/binary_combo_example.png "Binary Example"
 [image4]: ./report/warped_straight_lines.png "Warp Example"
@@ -26,19 +26,20 @@ The goals / steps of this project are the following:
 [video1]: ./project_video.mp4 "Video"
 
 ## [Rubric](https://review.udacity.com/#!/rubrics/571/view) Points
-###Here I will consider the rubric points individually and describe how I addressed each point in my implementation.  
+### Here I will consider the rubric points individually and describe how I addressed each point in my implementation.  
 
 ---
-###Writeup / README
+### Writeup / README
 
-####1. Provide a Writeup / README that includes all the rubric points and how you addressed each one.  You can submit your writeup as markdown or pdf.  [Here](https://github.com/udacity/CarND-Advanced-Lane-Lines/blob/master/writeup_template.md) is a template writeup for this project you can use as a guide and a starting point.  
+### 1. Provide a Writeup / README that includes all the rubric points and how you addressed each one.  You can submit your writeup as markdown or pdf.  [Here](https://github.com/udacity/CarND-Advanced-Lane-Lines/blob/master/writeup_template.md) is a template writeup for this project you can use as a guide and a starting point.  
 
 You're reading it!
 
 I tried to use the ipython notebook to document the whole project in detail.
-###Camera Calibration
 
-#### 1. Briefly state how you computed the camera matrix and distortion coefficients. Provide an example of a distortion corrected calibration image.
+### Camera Calibration
+
+### 1. Briefly state how you computed the camera matrix and distortion coefficients. Provide an example of a distortion corrected calibration image.
 
 The code for this step is contained in the first section of the IPython notebook located in "./examples/example.ipynb". I wrote 2 helper functions:
 `prepare_calibration` and `calibrate_camera`.
@@ -51,14 +52,14 @@ I then used the output `objpoints` and `imgpoints` to compute the camera calibra
 
 ![alt text][image1]
 
-###Pipeline (single images)
+### Pipeline (single images)
 
-####1. Provide an example of a distortion-corrected image.
+### 1. Provide an example of a distortion-corrected image.
 After doing the calibration and obtained the camera matrix and distortion coefficients, I use `cv2.undistort` to apply the distortion correction to one of the test images like this one:
 ![alt text][image2]
 
 
-####2. Describe how (and identify where in your code) you performed a perspective transform and provide an example of a transformed image.
+### 2. Describe how (and identify where in your code) you performed a perspective transform and provide an example of a transformed image.
 
 Instead of doing color and gradient thresholding to the undistorted image, the second step of my pipeline is perspective transformation. Here the goal is to obtain the `M` and `M_inv` matrices using `cv2.getPerspectiveTransform`. The code is located in the 2nd section of my ipython notebook, and the function is called `perspective_transform`.
 
@@ -88,7 +89,7 @@ I verified that my perspective transform was working as expected by drawing the 
 
 After getting the calibration parameters and the perspective transform matrices, I use pickle to save them in a file called "saved_params.p", so I don't have to rerun these steps every time. This part of the code is located at the 4th cell of the ipython notebook. 
 
-####3. Describe how (and identify where in your code) you used color transforms, gradients or other methods to create a thresholded binary image.  Provide an example of a binary image result.
+### 3. Describe how (and identify where in your code) you used color transforms, gradients or other methods to create a thresholded binary image.  Provide an example of a binary image result.
 
 This part is contained in section 3 of my ipython notebook.
 
@@ -96,7 +97,7 @@ I used a combination of color and gradient thresholds to generate a binary image
 
 ![alt text][image3]
 
-####4. Describe how (and identify where in your code) you identified lane-line pixels and fit their positions with a polynomial?
+### 4. Describe how (and identify where in your code) you identified lane-line pixels and fit their positions with a polynomial?
 
 Detect lane line pixels consists of the following steps:
 
@@ -108,7 +109,7 @@ Detect lane line pixels consists of the following steps:
 
 The above procedure, which is implemented in function `find_lane_sliding_window` in section 4 of my ipythohn notebook, assumes there is no previous knowledge of where the lanes are. However, if I already have a good fit from previous video frame, I can simply search points within a certain distance from my previously identified and fitted lane. This idea is implemented in function called `find_lanes_without_window`.
 
-####5. Describe how (and identify where in your code) you calculated the radius of curvature of the lane and the position of the vehicle with respect to center.
+### 5. Describe how (and identify where in your code) you calculated the radius of curvature of the lane and the position of the vehicle with respect to center.
 
 We already have the equations to calculate the radius of curvature for our fitted polynomials. However, we need to convert the unit from pixel to meters. To determin the parameters `x_meter_per_pixel` and `y_meter_per_pixel`, I measured in the warped image and found that the width of the lane (3.7 meters) taks 854 pixels, and the gap in the dashed linne (3 meters) takes 386 pixels. So we have 
 ```
@@ -117,7 +118,7 @@ We already have the equations to calculate the radius of curvature for our fitte
 ```
 The code for calculating the radius of curvature is in function `measure_curvature`.
 
-To find the position of the vehicle with respect to the center, we need to identify the center of the lane in the ***original cameral view*** (instead of the warped image, or the bird-eye view),  compare it with the center of the lane (1280/2), and then convert the difference into meter.
+To find the position of the vehicle with respect to the center, we need to identify the center of the lane in the ***original camera view*** (instead of the warped image, or the bird-eye view),  compare it with the center of the lane (1280/2), and then convert the difference into meter.
 
 The problem is, we only identify the lanes in the warped image, and how to convert the x coordinates of the lanes in the warped image to those in the original image. Searching documentation of warpPerspective, I found how to use the `M` and `Minv` matrices to convert a point's coordinate from a source image to the coordinate in the destination image.
 
@@ -126,9 +127,7 @@ In our case, we know the coordinate of the bottom point of a lane in the warped 
 The implementation of this step is in function `find_distance()`.
 
 
-
-
-####6. Provide an example image of your result plotted back down onto the road such that the lane area is identified clearly.
+### 6. Provide an example image of your result plotted back down onto the road such that the lane area is identified clearly.
 
 I implemented this step in lines # through # in my code in the function `draw_result_in_car_view`.  Here is an example of my result on a test image:
 
@@ -136,17 +135,17 @@ I implemented this step in lines # through # in my code in the function `draw_re
 
 ---
 
-###Pipeline (video)
+### Pipeline (video)
 
-####1. Provide a link to your final video output.  Your pipeline should perform reasonably well on the entire project video (wobbly lines are ok but no catastrophic failures that would cause the car to drive off the road!).
+### 1. Provide a link to your final video output.  Your pipeline should perform reasonably well on the entire project video (wobbly lines are ok but no catastrophic failures that would cause the car to drive off the road!).
 
 Here's a [link to my video result](./project_video.mp4)
 
 ---
 
-###Discussion
+### Discussion
 
-####1. Briefly discuss any problems / issues you faced in your implementation of this project.  Where will your pipeline likely fail?  What could you do to make it more robust?
+### 1. Briefly discuss any problems / issues you faced in your implementation of this project.  Where will your pipeline likely fail?  What could you do to make it more robust?
 
 This project is very challenging. 
 
