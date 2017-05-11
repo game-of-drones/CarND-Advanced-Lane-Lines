@@ -23,7 +23,8 @@ The goals / steps of this project are the following:
 [image4]: ./report/warped_straight_lines.png "Warp Example"
 [image5]: ./examples/color_fit_lines.jpg "Fit Visual"
 [image6]: ./report/final_output.png "Output"
-[video1]: ./project_video.mp4 "Video"
+[video1]: ./examples/output_project_video.mp4 "Video"
+[docs]:   ./report/warpPerspectiveDocs.png "docs"
 
 ## [Rubric](https://review.udacity.com/#!/rubrics/571/view) Points
 ### Here I will consider the rubric points individually and describe how I addressed each point in my implementation.  
@@ -111,16 +112,18 @@ The above procedure, which is implemented in function `find_lane_sliding_window`
 
 ### 5. Describe how (and identify where in your code) you calculated the radius of curvature of the lane and the position of the vehicle with respect to center.
 
-We already have the equations to calculate the radius of curvature for our fitted polynomials. However, we need to convert the unit from pixel to meters. To determin the parameters `x_meter_per_pixel` and `y_meter_per_pixel`, I measured in the warped image and found that the width of the lane (3.7 meters) taks 854 pixels, and the gap in the dashed linne (3 meters) takes 386 pixels. So we have 
+We already have the equations to calculate the radius of curvature for our fitted polynomials. However, we need to convert the unit from pixel to meters. To determin the parameters `x_meter_per_pixel` and `y_meter_per_pixel`, I measured in the warped image and found that the width of the lane (3.7 meters) taks 854 pixels, and the gap in the dashed linne (3 meters) takes 170 pixels. So we have 
 ```
   x_meter_per_pixel = 3.7/854
-  y_meter_per_pixel = 3.0/386 
+  y_meter_per_pixel = 3.0/170 
 ```
 The code for calculating the radius of curvature is in function `measure_curvature`.
 
 To find the position of the vehicle with respect to the center, we need to identify the center of the lane in the ***original camera view*** (instead of the warped image, or the bird-eye view),  compare it with the center of the lane (1280/2), and then convert the difference into meter.
 
 The problem is, we only identify the lanes in the warped image, and how to convert the x coordinates of the lanes in the warped image to those in the original image. Searching documentation of warpPerspective, I found how to use the `M` and `Minv` matrices to convert a point's coordinate from a source image to the coordinate in the destination image.
+
+![alt text][docs]
 
 In our case, we know the coordinate of the bottom point of a lane in the warped image (xwarp, ywarp), we want to find the corresponding point in the original undistorted image (xundist, yundist). From the formula above, we select destination image to be the warped image, and the source image to be the undistorted image, and our matrix is `M`.
 
@@ -129,17 +132,20 @@ The implementation of this step is in function `find_distance()`.
 
 ### 6. Provide an example image of your result plotted back down onto the road such that the lane area is identified clearly.
 
-I implemented this step in lines # through # in my code in the function `draw_result_in_car_view`.  Here is an example of my result on a test image:
+I implemented this step in function `draw_result_in_car_view()`.  Here is an example of my result on a test image:
 
 ![alt text][image6]
 
+### 7. Full pipeline
+
+My full pipeline is in function `my_pipeline()`.
 ---
 
 ### Pipeline (video)
 
 ### 1. Provide a link to your final video output.  Your pipeline should perform reasonably well on the entire project video (wobbly lines are ok but no catastrophic failures that would cause the car to drive off the road!).
 
-Here's a [link to my video result](./example/output_project_video.mp4)
+Here's a [link to my video result](./examples/output_project_video.mp4)
 
 ---
 
